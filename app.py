@@ -5,6 +5,7 @@ import MySQLdb.cursors
 import re
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
+import datetime
 # from services import sessionService, voucherService, regionService
 import os
   
@@ -91,7 +92,7 @@ mysql = MySQL(app)
 #     return jsonify(result)
 #     # return render_template('register.html', mesage = mesage)
 
-class App(Resource):
+class App(Resource): 
     def post(self,serviceName):
         try:
             # rs = self.rs
@@ -130,32 +131,31 @@ class App(Resource):
 
     def get(self,serviceName):
         try:
-            rs = {'response_code': '', 'response_message': '','date_process': '', 'promo': [], 'data': []}
+            rs = {'response_code': '', 'response_message': '','date_process': '', 'data': []}
 
             if serviceName == 'arduino':
                 
                 cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
                 cursor.execute('SELECT * FROM arduino_value')
-                av = cursor.fetchall()
+                av = cursor.fetchall() 
                 if av != '' :
-                    mesage = 'Logged in successfully !'
-                    resp ='00'
+                    rs['response_code'] = '00'
+                    rs['response_message'] = 'sukses'
+                    rs['date_process'] = datetime.datetime.now()
                     for row in av:
-                        result = {}
-                        result['id'] = row['av_id']
+                        result = {} 
+                        result['av_id'] = row['av_id']
                         result['temperatur'] = row['av_temperatur']
                         result['acidity'] = row['av_acidity']
                         result['turbidity'] = row['av_turbidity']
                         result['tds'] = row['av_tds']
+                        result['av_create_date'] = row['av_create_date']
                         # print(row['av_id'])
-                        
-                    return jsonify(result)
+                        rs['data'].append(result)   
+                    return jsonify(rs)
                 else : 
-                    mesage = 'Data is not available'
-                    resp = '99'
-                    result['response_message'] = mesage
-                    result['response_code'] = resp
-                    return jsonify(result)
+                    return jsonify({"response_message": "data tidak ada", "response_code": "99", "data": []})
+
                 
                 
         except Exception as e:
