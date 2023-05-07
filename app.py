@@ -6,103 +6,68 @@ import re
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 import datetime
+# from flask_bcrypt import Bcrypt
 # from services import sessionService, voucherService, regionService
-import os
-  
+import os 
+
   
 app = Flask(__name__)
 api = Api(app)
+# bcrypt = Bcrypt(app)s
 
-app.secret_key = 'xyzsdfg'
+app.secret_key = 'filtra@fdl'
 app.config['JSON_SORT_KEYS'] = False
 
   
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_DB'] = 'skripsi'
-  
+app.config['MYSQL_HOST'] = 'srv143.niagahoster.com'
+app.config['MYSQL_USER'] = 'filt9288_luthfi'
+app.config['MYSQL_PASSWORD'] = 'Skripsiberes'
+app.config['MYSQL_DB'] = 'filt9288_filtration_detergent_laundry'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = ''
+# app.config['MYSQL_DB'] = 'filtration_detergent_laundry'
 mysql = MySQL(app)
-  
-# @app.route('/')
-# @app.route('/login', methods =['GET', 'POST'])
-# def login():
-#     mesage = ''
-#     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
-#         result = {}
-#         email = request.form['email']
-#         password = request.form['password']
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute('SELECT * FROM account WHERE email = % s AND password = % s', (email, password, ))
-#         user = cursor.fetchone()
-#         if user:
-#             result['loggedin'] = True
-#             result['id'] = user['id']
-#             result['username'] = user['username']
-#             result['email'] = user['email']
-#             mesage = 'Logged in successfully !'
-#             # return render_template('user.html', mesage = mesage)
-
-#         else:
-#             mesage = 'Please enter correct email / password !'
-#     # return render_template('login.html', mesage = mesage)
-#         result['mesage'] = mesage
-#     return jsonify(result)
-  
-# @app.route('/logout')
-# def logout():
-#     session.pop('loggedin', None)
-#     session.pop('id', None)
-#     session.pop('email', None)
-#     return redirect(url_for('login'))
-  
-# @app.route('/register', methods =['GET', 'POST'])
-# def register():
-#     mesage = ''
-    
-#     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form :
-#         result = {}
-#         userName = request.form['username']
-#         password = request.form['password']
-#         email = request.form['email']
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute('SELECT * FROM account WHERE email = % s', (email, ))
-#         account = cursor.fetchone()
-#         if account:
-#             mesage = 'Account already exists !'
-#             resp = '99'
-#         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-#             mesage = 'Invalid email address !'
-#             resp = '99'
-#         elif not userName or not password or not email:
-#             mesage = 'Please fill out the form !'
-#             resp = '99'
-#         else:
-#             cursor.execute('INSERT INTO account VALUES (NULL, % s, % s, % s)', (userName, password,email,))
-#             # status, result= cursor.executeData('INSERT INTO account VALUES (NULL, % s, % s, % s)', (userName, password,email,))
-#             # print(result)
-#             # print(status)
-#             mysql.connection.commit()
-#             mesage = 'You have successfully registered !'
-#             resp = '00'
-#     elif request.method == 'POST':
-#         mesage = 'Please fill out the form !'
-#     # return 'username': userName
-#     result['response_message'] = mesage
-#     result['response_code'] = resp
-#     return jsonify(result)
-#     # return render_template('register.html', mesage = mesage)
 
 class App(Resource): 
     def post(self,serviceName):
         try:
             # rs = self.rs
-            if serviceName =='register':
+            rs = {'response_code': '', 'response_message': '','date_process': '', 'data': []}
+            if serviceName == 'login':
                 result = {}
-                userName = request.form['username']
-                password = request.form['password']
-                email = request.form['email']
+                username = request.form['ua_username']
+                password = request.form['ua_password']
                 cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-                cursor.execute('SELECT * FROM account WHERE email = % s', (email, ))
+                cursor.execute('SELECT * FROM user_account WHERE ua_username = % s AND ua_password = % s', (username, password, ))
+                user = cursor.fetchone()
+                if user:
+                    result['ua_create_date'] = user['ua_create_date']
+                    result['loggedin'] = True
+                    result['id'] = user['ua_id']
+                    result['username'] = user['ua_username']
+                    result['email'] = user['ua_email']
+                    rs['data'].append(result)
+                    rs['response_code'] = '00'
+                    rs['response_message'] = 'Successs'
+                    rs['date_process'] = datetime.datetime.now()
+                    # return render_template('user.html', mesage = mesage)
+
+                else:
+                    rs['response_code'] = '99'
+                    rs['response_message'] = "username/password doesn't match"
+                return jsonify(rs)
+            
+            elif serviceName =='register':
+                result = {}
+                userName = request.form['ua_username']
+                email = request.form['ua_email']
+                password = request.form['ua_password']
+                # password = 'hunter2'
+                # pw_hash = bcrypt.generate_password_hash(password)
+                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                print(cursor)
+                cursor.execute('SELECT * FROM user_account WHERE ua_email = % s', (email, ))
                 account = cursor.fetchone()
                 if account:
                     mesage = 'Account already exists !'
@@ -114,10 +79,7 @@ class App(Resource):
                     mesage = 'Please fill out the form !'
                     resp = '99'
                 else:
-                    cursor.execute('INSERT INTO account VALUES (NULL, % s, % s, % s)', (userName, password,email,))
-                    # status, result= cursor.executeData('INSERT INTO account VALUES (NULL, % s, % s, % s)', (userName, password,email,))
-                    # print(result)
-                    # print(status)
+                    cursor.execute('INSERT INTO user_account VALUES (NULL, % s, % s, % s,NOW())', (userName,email,password))
                     mysql.connection.commit()
                     mesage = 'You have successfully registered !'
                     resp = '00'
@@ -140,7 +102,7 @@ class App(Resource):
                 av = cursor.fetchall() 
                 if av != '' :
                     rs['response_code'] = '00'
-                    rs['response_message'] = 'sukses'
+                    rs['response_message'] = 'Successs'
                     rs['date_process'] = datetime.datetime.now()
                     for row in av:
                         result = {} 
@@ -163,4 +125,5 @@ class App(Resource):
 
 api.add_resource(App, '/<string:serviceName>')
 if __name__ == "__main__":
-    app.run()
+    # app.run()
+    app.run(host='localhost', port=3306, debug=True)
