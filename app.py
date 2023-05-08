@@ -19,9 +19,9 @@ app.secret_key = 'filtra@fdl'
 app.config['JSON_SORT_KEYS'] = False
 
   
-app.config['MYSQL_HOST'] = 'srv143.niagahoster.com'
-app.config['MYSQL_USER'] = 'filt9288_luthfi'
-app.config['MYSQL_PASSWORD'] = 'Skripsiberes'
+app.config['MYSQL_HOST'] = '194.163.42.201'
+app.config['MYSQL_USER'] = 'filt9288_pramono'
+app.config['MYSQL_PASSWORD'] = 'Luthfisangaji2301'
 app.config['MYSQL_DB'] = 'filt9288_filtration_detergent_laundry'
 # app.config['MYSQL_HOST'] = 'localhost'
 # app.config['MYSQL_USER'] = 'root'
@@ -126,4 +126,5 @@ class App(Resource):
 api.add_resource(App, '/<string:serviceName>')
 if __name__ == "__main__":
     # app.run()
-    app.run(host='localhost', port=3306, debug=True)
+    # app.run(host='194.163.42.210', port=3060, debug=True)
+    app.run(host='0.0.0.0', port=3060, debug=True)
