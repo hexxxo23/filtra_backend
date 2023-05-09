@@ -123,7 +123,7 @@ class App(Resource):
         except Exception as e:
             return jsonify({'Error': str(e)})
 
-api.add_resource(App, '/<string:serviceName>')
+api.add_resource(App, '/filtration-detergent-laundry/<string:serviceName>')
 if __name__ == "__main__":
     # app.run()
     # app.run(host='194.163.42.210', port=3060, debug=True)
